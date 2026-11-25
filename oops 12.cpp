@@ -1,145 +1,95 @@
+
 #include <iostream>
-#include <typeinfo>
 using namespace std;
 
-class Base
-{
+class Device {
 public:
-    virtual void show()
-    {
-        cout << "Base class show()" << endl;
+    virtual void show() {
+        cout << "Device class function called" << endl;
     }
 
-    virtual ~Base() {}
+    virtual ~Device() {}
 };
 
-class Derived : public Base
-{
+class Smartphone : public Device {
 public:
-    void show()
-    {
-        cout << "Derived class show()" << endl;
-    }
-
-    void derivedOnly()
-    {
-        cout << "Derived-only function called" << endl;
+    void smartphoneFeature() {
+        cout << "Smartphone feature accessed" << endl;
     }
 };
 
-int main()
-{
-    // ================= 1. static_cast =================
+int main() {
 
+    // 1. static_cast
     cout << "===== 1. static_cast =====" << endl;
 
-    int a = 7, b = 2;
+    int a = 9, b = 2;
 
-    cout << "Without cast : 7 / 2 = " << (a / b) << endl;
-    cout << "With cast    : 7 / 2 = "
+    cout << "Integer division: " << a / b << endl;
+
+    cout << "Floating division: "
          << static_cast<double>(a) / b << endl;
 
-    double d = 9.99;
-    int i = static_cast<int>(d);
+    double price = 249.85;
 
-    cout << "double 9.99 to int : " << i << endl;
+    cout << "Double to int: "
+         << static_cast<int>(price) << endl;
 
-    char ch = 'A';
+    char letter = 'A';
 
-    cout << "char 'A' to int : " << static_cast<int>(ch) << endl;
+    cout << "Char to int: "
+         << static_cast<int>(letter) << endl;
 
-    int n = 97;
 
-    cout << "int 97 to char : " << static_cast<char>(n) << endl;
+    // 2. dynamic_cast
+    cout << "\n===== 2. dynamic_cast =====" << endl;
 
-    Derived dObj;
-    Base *basePtr = &dObj;
+    Device* d1 = new Smartphone();
+    Device* d2 = new Device();
 
-    Derived *dPtr = static_cast<Derived*>(basePtr);
-    // Downcast in the same hierarchy
+    Smartphone* s1 = dynamic_cast<Smartphone*>(d1);
+    Smartphone* s2 = dynamic_cast<Smartphone*>(d2);
 
-    dPtr->derivedOnly();
-
-    // ================= 2. dynamic_cast =================
-
-    cout << endl << "===== 2. dynamic_cast =====" << endl;
-
-    Base *b1 = new Derived();
-    // Base pointer holding a Derived object
-
-    Base *b2 = new Base();
-    // Base pointer holding a Base object
-
-    Derived *d1 = dynamic_cast<Derived*>(b1);
-
-    if (d1 != NULL)
-    {
-        cout << "Cast of b1 succeeded: ";
-        d1->derivedOnly();
-    }
-    else
-    {
-        cout << "Cast of b1 failed" << endl;
+    if (s1 != nullptr) {
+        cout << "Valid cast: ";
+        s1->smartphoneFeature();
     }
 
-    Derived *d2 = dynamic_cast<Derived*>(b2);
-
-    if (d2 != NULL)
-    {
-        cout << "Cast of b2 succeeded" << endl;
-    }
-    else
-    {
-        cout << "Cast of b2 failed: dynamic_cast returned NULL" << endl;
+    if (s2 == nullptr) {
+        cout << "Invalid cast: returned nullptr" << endl;
     }
 
-    try
-    {
-        Derived &ref = dynamic_cast<Derived&>(*b2);
-        ref.derivedOnly();
-    }
-    catch (bad_cast &)
-    {
-        cout << "Reference cast of *b2 failed: bad_cast exception caught"
-             << endl;
-    }
+    delete d1;
+    delete d2;
 
-    delete b1;
-    delete b2;
 
-    // ================= 3. const_cast =================
+    // 3. const_cast
+    cout << "\n===== 3. const_cast =====" << endl;
 
-    cout << endl << "===== 3. const_cast =====" << endl;
+    int value = 40;
 
-    int val = 50;
+    const int* constPtr = &value;
 
-    const int *cPtr = &val;
-    // Pointer to const int
+    int* modifiablePtr = const_cast<int*>(constPtr);
 
-    cout << "Before const_cast : val = " << val << endl;
+    *modifiablePtr = 75;
 
-    int *ncPtr = const_cast<int*>(cPtr);
-    // Remove constness from the pointer type
+    cout << "Value after const_cast: "
+         << value << endl;
 
-    *ncPtr = 100;
 
-    cout << "After const_cast : val = " << val << endl;
+    // 4. reinterpret_cast
+    cout << "\n===== 4. reinterpret_cast =====" << endl;
 
-    // ================= 4. reinterpret_cast =================
+    int number = 65;
 
-    cout << endl << "===== 4. reinterpret_cast =====" << endl;
+    unsigned char* bytePtr =
+        reinterpret_cast<unsigned char*>(&number);
 
-    int num = 65;
+    cout << "Integer value: " << number << endl;
 
-    int *iPtr = &num;
-
-    char *cp = reinterpret_cast<char*>(iPtr);
-    // View the int's memory through a char pointer
-
-    cout << "Value of int        : " << num << endl;
-
-    cout << "First byte as char : " << *cp
-         << " (ASCII " << static_cast<int>(*cp) << ")" << endl;
+    cout << "First byte (character): "
+         << static_cast<char>(*bytePtr) << endl;
 
     return 0;
 }
